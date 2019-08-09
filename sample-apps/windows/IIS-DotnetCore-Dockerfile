@@ -1,0 +1,6 @@
+FROM microsoft/iis:latest
+## Install dotnet 2.2.6 hosting pack
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';"]
+ADD https://download.visualstudio.microsoft.com/download/pr/a9bb6d52-5f3f-4f95-90c2-084c499e4e33/eba3019b555bb9327079a0b1142cc5b2/dotnet-hosting-2.2.6-win.exe "C:/setup/dotnet-hosting-2.2.6-win.exe"
+RUN start-process -Filepath "C:/setup/dotnet-hosting-2.2.6-win.exe" -ArgumentList @('/install', '/quiet', '/norestart') -Wait 
+RUN Remove-Item -Force "C:/setup/dotnet-hosting-2.2.6-win.exe"
