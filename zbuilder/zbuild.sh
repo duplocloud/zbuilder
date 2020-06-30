@@ -1,10 +1,11 @@
 #!/bin/bash
+
 mkdir /root/.ssh
 aws s3 --region "us-west-2" cp s3://$S3_BUCKET/git.key /root/.ssh/id_rsa
 chmod 400 /root/.ssh/id_rsa
 echo "    IdentityFile ~/.ssh/id_rsa" >> /etc/ssh/ssh_config
-
 ssh -o StrictHostKeyChecking=no git@github.com
+ 
 echo $GIT_REPO
 export CODE_DIR="code"
 cd "$(dirname "$0")"
