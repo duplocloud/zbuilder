@@ -41,7 +41,7 @@ RUN apt-get install -y openssh-client
 #jdk repository
 RUN add-apt-repository ppa:openjdk-r/ppa
 
-USER root
+#USER root
 ###  remove below if using build-image.sh
 COPY zbuild.sh /zbuild.sh
 COPY zbuildmonitor.py /zbuildmonitor.py

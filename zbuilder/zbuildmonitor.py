@@ -15,20 +15,20 @@ def s3Upload(targetFile, srcFile):
     if lFileExists != True:
         print('**** Requested file does not exist yet')
         return
+
     bucket = os.getenv('S3_BUCKET')
     s3_client = boto3.client('s3')
-    try:
-        response = s3_client.upload_file(srcFile, bucket, targetFile)
-    except ClientError as e:
-        logging.error(e)
-        return False
-    return True
+
+    targetFile = os.getenv('GIT_REPO') + '/' + targetFile
+    print('**** uploading file ' + srcFile + ' toFile ' + bucket + '/' + targetFile)
+    response = s3_client.upload_file(srcFile, bucket, targetFile)
+    print('**** uploaded file ' + srcFile + ' toFile ' + bucket + '/' + targetFile)
 
 # def s3Upload(targetFile, srcFile):
 #     lFileExists = os.path.isfile(srcFile)
-#     print('Call to upload ' + srcFile + ' toFile ' + targetFile)
+#     print 'Call to upload ' + srcFile + ' toFile ' + targetFile
 #     if lFileExists != True:
-#         print('**** Requested file does not exist yet')
+#         print '**** Requested file does not exist yet'
 #         return
 #     targetFile = os.getenv('GIT_REPO') + '/' + targetFile
 #     bucketName = os.getenv('S3_BUCKET')
@@ -37,6 +37,7 @@ def s3Upload(targetFile, srcFile):
 #     k = Key(b)
 #     k.key = targetFile
 #     k.set_contents_from_filename(srcFile)
+
 
 def uploadLogs(aInRunning):
     print('Begin log upload')
@@ -51,10 +52,11 @@ def uploadLogs(aInRunning):
 
 
 def isBuildRunning():
-    # val = subprocess.check_output(["sudo","ps", "-ax"])
     val = subprocess.check_output(["ps", "-ax"])
-    lStatus = val.decode("utf-8")
+    lStatus = val.decode("utf-8") 
     lProcs = lStatus.splitlines()
+    print("Build is still running ", lStatus)
+
     lRunning = False
     for lProc in lProcs:
         if 'zbuild.sh' in lProc:
