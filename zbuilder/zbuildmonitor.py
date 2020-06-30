@@ -47,13 +47,13 @@ def uploadLogs(aInRunning):
     s3Upload(logFileName, '/zbuild.log')
 
     if aInRunning == False:
-        logFileName = '/' + logFileName + '.complete'
-        s3Upload(logFileName, logFileName)
+        logFileName =  logFileName + '.complete'
+        s3Upload(logFileName, '/' + logFileName)
 
 
 def isBuildRunning():
     val = subprocess.check_output(["ps", "-ax"])
-    lStatus = val.decode("utf-8") 
+    lStatus = val.decode("utf-8")
     lProcs = lStatus.splitlines()
     print("Build is still running ", lStatus)
 
