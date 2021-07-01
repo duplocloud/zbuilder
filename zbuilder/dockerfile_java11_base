@@ -1,0 +1,31 @@
+FROM duplocloud/zbuilder:java_v1
+
+RUN add-apt-repository ppa:openjdk-r/ppa
+RUN apt-get update
+RUN apt-get install --yes --no-install-recommends openjdk-8-jdk
+#RUN update-alternatives --config java
+#RUN update-alternatives --config javac
+#RUN apt-get install --yes --no-install-recommends sbt=0.13.13
+RUN java -version
+
+RUN apt-get install --yes --no-install-recommends maven
+
+# initialize sbt for faster runs
+RUN sbt help
+# faster dependency fetching using coursier
+#RUN mkdir -p ~/.sbt/0.13/plugins && echo 'addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-M15")' > ~/.sbt/0.13/plugins/build.sbt
+# initialize sbt-coursier
+#RUN sbt help
+
+# other stuff needed by the builder scripts
+RUN pip install --upgrade six>=1.10
+RUN pip install boto==2.9.7
+RUN pip install -U pip
+RUN pip install awscli
+
+COPY zbuild.sh /zbuild.sh
+COPY zbuildmonitor.py /zbuildmonitor.py
+
+# set up supervisord
+ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+ENTRYPOINT ["/bin/bash", "-c", "/usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf -n"]

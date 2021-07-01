@@ -1,0 +1,56 @@
+FROM ubuntu:18.04
+RUN apt-get clean
+RUN apt-get update
+RUN apt-get install --yes --no-install-recommends apt-transport-https ca-certificates software-properties-common
+RUN apt-get install --yes --no-install-recommends curl
+RUN apt-get install --yes --no-install-recommends wget
+RUN apt-get install --yes --no-install-recommends build-essential python2.7 python2.7-dev python-pip
+RUN apt-get install -y apt-transport-https  ca-certificates curl gnupg-agent software-properties-common
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs) \ stable"
+RUN apt-get update
+RUN apt-get install -y docker-ce docker-ce-cli containerd.io
+RUN apt-get install --yes --no-install-recommends supervisor
+RUN apt-get install --yes --no-install-recommends vim
+RUN apt-get install --yes --no-install-recommends apt-transport-https
+
+#jdk repository
+RUN add-apt-repository ppa:openjdk-r/ppa
+
+#sbt repository
+RUN echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list
+RUN echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 642AC823
+
+RUN apt-get update
+
+RUN apt-get install --yes --no-install-recommends openjdk-8-jdk
+RUN update-alternatives --config java
+RUN update-alternatives --config javac
+RUN apt-get install --yes --no-install-recommends sbt=0.13.13
+
+RUN apt-get install --yes --no-install-recommends maven
+# RUN apt-get install --yes --no-install-recommends awscli
+
+# initialize sbt for faster runs
+# RUN sbt help
+# faster dependency fetching using coursier
+# RUN mkdir -p ~/.sbt/0.13/plugins && echo 'addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-M15")' > ~/.sbt/0.13/plugins/build.sbt
+# initialize sbt-coursier
+# RUN sbt help
+
+# other stuff needed by the builder scripts
+RUN pip install --upgrade six>=1.10
+RUN pip install setuptools
+RUN pip install boto
+RUN pip install -U pip
+RUN pip install awscli
+
+RUN pip install requests logger
+
+COPY zbuild.sh /zbuild.sh
+COPY zbuildmonitor.py /zbuildmonitor.py
+
+# set up supervisord
+ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+ENTRYPOINT ["/bin/bash", "-c", "/usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf -n"]

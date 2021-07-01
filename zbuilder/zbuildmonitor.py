@@ -35,7 +35,7 @@ def uploadLogs(aInRunning):
     
 
 def isBuildRunning():
-    val = subprocess.check_output(["sudo","ps", "-ax"])
+    val = subprocess.check_output(["ps", "-ax"])
     lStatus = val.decode("utf-8")
     lProcs = lStatus.splitlines()
     lRunning = False
@@ -87,4 +87,3 @@ def main():
 
 if __name__ == '__main__':
    main()
-  
