@@ -23,7 +23,7 @@ RUN apt-get install --yes --no-install-recommends apt-transport-https
 ENV GOROOT /opt/go
 ENV GOPATH /root/.go
 
-ENV GOVERSION 1.15.3
+ENV GOVERSION 1.17.5
 ENV DEBIAN_FRONTEND noninteractive
 ENV INITRD No
 ENV LANG en_US.UTF-8
@@ -51,6 +51,12 @@ RUN mkdir -p $GOBIN
 ENV PATH=$PATH:$GOROOT/bin:$GOBIN
 
 RUN  apt-get update && apt-get -y install libprotobuf-dev protobuf-compiler golang-goprotobuf-dev
+
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash
+
+RUN apt-get install -y nodejs
+RUN node -v
+RUN npm -v
 
 
 # other stuff needed by the builder scripts
