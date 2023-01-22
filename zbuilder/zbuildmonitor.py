@@ -1,29 +1,25 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3
 import sys
 import os
 import os.path
 import traceback
 import subprocess
 import time
-import boto
-from boto.s3.key import Key
+import boto3
 
 def s3Upload(targetFile, srcFile):
     lFileExists = os.path.isfile(srcFile) 
-    print 'Call to upload ' + srcFile + ' toFile ' + targetFile
+    print('Call to upload ' + srcFile + ' toFile ' + targetFile)
     if lFileExists != True:
-        print '**** Requested file does not exist yet'
+        print('**** Requested file does not exist yet')
         return
     targetFile = os.getenv('GIT_REPO') + '/' + targetFile
     bucketName = os.getenv('S3_BUCKET')
-    conn = boto.connect_s3()
-    b = conn.get_bucket(bucketName)
-    k = Key(b)
-    k.key = targetFile
-    k.set_contents_from_filename(srcFile)
+    s3 = boto3.resource('s3')
+    s3.Object(bucketName, targetFile).put(Body=open(srcFile, 'rb'))
 
 def uploadLogs(aInRunning):
-    print 'Begin log upload'
+    print('Begin log upload')
     logFileName = os.getenv('LOG_FILE')
     logFileName = logFileName + '_' + os.getenv('REPLICA_ID')
     # Upload the files
@@ -41,11 +37,11 @@ def isBuildRunning():
     lRunning = False
     for lProc in lProcs:
         if 'zbuild.sh' in lProc:
-            print "Build is still running"
+            print("Build is still running")
             lRunning = True
             break
     if lRunning == False:
-        print 'Build is not running'
+        print('Build is not running')
  
     return lRunning
        
@@ -54,17 +50,16 @@ def launchBuild():
 
     
 def main():
-    print "Starting Build Process"
+    print("Starting Build Process")
     lRunning = isBuildRunning()
 
     if lRunning == False:
-        print 'Starting new build'
+        print('Starting new build')
         launchBuild()
     else:
-        print 'Old build is running'
+        print('Old build is running')
  
-    print "Starting build monitor"
-    #import pdb; pdb.set_trace()
+    print("Starting build monitor")
     lRunning = False
     while(True):
         time.sleep(10)
@@ -74,12 +69,11 @@ def main():
             uploadLogs(lRunning)
             if lRunning == False:
                 break
-        except Exception, e:
-            # import pdb; pdb.set_trace()
-            print ("********************************************* UpdateLogs encountered an exception", sys.exc_info()[0])
-        print '=============================================== Updatelogs Completed'
+        except(Exception):
+            print("********************************************* UpdateLogs encountered an exception", sys.exc_info()[0])
+        print('=============================================== Updatelogs Completed')
      
-    print 'No more log upload go to idle state'
+    print('No more log upload go to idle state')
     # Wait for the master to kill	      
     while(True):
         time.sleep(60)
