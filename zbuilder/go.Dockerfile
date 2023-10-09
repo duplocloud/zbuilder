@@ -1,4 +1,7 @@
 FROM ubuntu:20.04
+
+ARG GOVERSION 1.17.5
+
 RUN apt-get clean
 RUN apt-get update
 RUN apt-get install --yes --no-install-recommends apt-transport-https ca-certificates software-properties-common
@@ -23,7 +26,7 @@ RUN apt-get install --yes --no-install-recommends apt-transport-https
 ENV GOROOT /opt/go
 ENV GOPATH /root/.go
 
-ENV GOVERSION 1.17.5
+ENV GOVERSION $GOVERSION
 ENV DEBIAN_FRONTEND noninteractive
 ENV INITRD No
 ENV LANG en_US.UTF-8
