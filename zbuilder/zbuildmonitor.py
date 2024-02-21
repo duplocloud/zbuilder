@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 import sys
 import os
 import os.path
@@ -17,19 +17,20 @@ def s3Upload(targetFile, srcFile):
         return
     targetFile = os.getenv('GIT_REPO') + '/' + targetFile
     bucketName = os.getenv('S3_BUCKET')
-    s3 = boto3.resource('s3')
-    s3.meta.client.upload_file(srcFile, bucketName, targetFile)
+    s3_client = boto3.client('s3')
+    s3_client.upload_file(srcFile, bucketName, targetFile)
 
 def uploadLogs(aInRunning):
-    print ('Begin log upload')
+    print ('Begin log upload. Running status: ' + str(aInRunning))
     logFileName = os.getenv('LOG_FILE')
     logFileName = logFileName + '_' + os.getenv('REPLICA_ID')
     # Upload the files
     s3Upload(logFileName, '/zbuild.log') 
     
     if not aInRunning:
-        logFileName = '/' + logFileName + '.complete'
-        s3Upload(logFileName, logFileName)
+        print ('build is complete. Running status: ' + str(aInRunning))
+        logFileName = logFileName + '.complete'
+        s3Upload(logFileName, '/' + logFileName)
     
 
 def isBuildRunning():
